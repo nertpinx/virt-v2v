@@ -262,6 +262,12 @@ object
     error_unless_output_alloc_sparse output_alloc;
 
     (* Python code prechecks. *)
+    let json_params = match rhv_options.rhv_disk_uuids with
+    | None -> json_params
+    | Some uuids ->
+        let ids = List.map (fun uuid -> JSON.String uuid) uuids in
+        ("rhv_disk_uuids", JSON.List ids) :: json_params
+    in
     let precheck_fn = tmpdir // "v2vprecheck.json" in
     let fd = Unix.openfile precheck_fn [O_WRONLY; O_CREAT] 0o600 in
     if Python_script.run_command ~stdout_fd:fd
